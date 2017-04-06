@@ -10,9 +10,15 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var display: UILabel! // yes its an optional, but I will auto unwrap everyplace.
+    // Controller instantiates the model
+    private var model = CalculatorModel()
+
     var userIsTyping = false
 
+    // IS this Weak var to avoid an ownership loop with the model which puts results in the display.
+    @IBOutlet weak var display: UILabel! // ! - yes its an optional, but I will auto unwrap everyplace.
+
+    // Computed property - just simply a different way of interacting with the var "display"
     var displayValue : Double {
         get{
             return Double(display.text!)!
@@ -23,26 +29,52 @@ class ViewController: UIViewController {
         }
     }
 
-    private var model = CalculatorModel()
-    
+    // process numeric inputs - no interaction with model as number is built up
     @IBAction func touchDigit(_ sender: UIButton) {
+
         let digit = sender.currentTitle!
-        
-        if userIsTyping {
-            let textCurrentlyInDisplay = display.text!
-            if (digit == "." && textCurrentlyInDisplay.contains("."))
-            {
-                return  // don't add two decimal places - make an error sound
+        let currentText = display.text!
+
+        switch digit
+        {
+        case ".":   // add preceeding 0 if first digit is decimal place
+            if userIsTyping == false {
+                display.text = "0."
+                userIsTyping = true
+            } else if currentText.contains("."){
+                // indicate error - shake screen or beep
+                return
             }
-            display.text = textCurrentlyInDisplay + digit
+            else {
+                display.text = currentText + digit
+            }
             
-        } else {
-            userIsTyping = true
-            display.text = digit
+        case "⌫":   // Don't do anything if first char is a backspace
+            if userIsTyping == false{
+                return   // do nothing if first char is a backspace
+            } else {
+                let newText = currentText.substring(to: currentText.index(before: currentText.endIndex))
+                if newText.characters.count > 0 {
+                    display.text = newText
+                } else {
+                    display.text = "0"
+                    userIsTyping = false
+                }
+            }
+            break;
+            
+        default:    // normal case is process the numeric digit
+            if userIsTyping {
+                display.text = currentText + digit
+            } else {
+                display.text = digit
+                userIsTyping = true
+            }
         }
-        
     }
     
+    
+    // When an operation button is pressed, send operands and operations to the model
     @IBAction func performOperation(_ sender: UIButton) {
         
         if userIsTyping{
@@ -60,14 +92,6 @@ class ViewController: UIViewController {
         }
     }
     
-//    @IBAction func setBinaryOperation(_ sender: UIButton) {
-//        if userIsTyping{
-//        //    model.setBinaryOperation(sender.currentTitle)
-//            model.setOperand(displayValue)
-//            userIsTyping = false
-//        }
-//        
-//    }
     
 }
 

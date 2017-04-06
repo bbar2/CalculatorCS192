@@ -26,13 +26,13 @@ struct CalculatorModel {
         }
     }
 
-    private var accumulator: Double?
+    private var accumulator: (value: Double?, description: String?)
     
     private var pendingBinaryOperation: PendingBinaryOperation?
     
     var result: Double? {
         get {
-            return accumulator
+            return accumulator.value
         }
     }
     
@@ -55,38 +55,52 @@ struct CalculatorModel {
     ]
     
     mutating func setOperand(_ operand: Double){
-        accumulator = operand
+        accumulator.value = operand
+        if accumulator.description != nil {
+            accumulator.description! += " \(operand)"
+        } else {
+            accumulator.description = String(operand)
+        }
+        print("setOperand: \(accumulator.description!)")
     }
     
     private mutating func performPendingBinaryOperation() {
-        if pendingBinaryOperation != nil && accumulator != nil {
-            //accumulator = pendingBinaryOperation!.perform(with:accumulator!)
-            accumulator = pendingBinaryOperation!.function(pendingBinaryOperation!.firstOperand, accumulator!)
+        if pendingBinaryOperation != nil && accumulator.value != nil {
+            accumulator.value = pendingBinaryOperation!.perform(with:accumulator.value!)
         }
     }
     
     mutating func performOperation(_ symbol: String){
-        print("performOperation \(symbol)")
 
         if let operation = operations[symbol] {
             switch (operation) {
             case .constant(let value):
-                accumulator = value
+                accumulator.value = value
                 
             case .unaryOp(let unaryFunc):
-                if accumulator != nil {
-                    accumulator = unaryFunc(accumulator!)
+                if accumulator.value != nil {
+                    accumulator.value = unaryFunc(accumulator.value!)
+                    accumulator.description = symbol + "(" + accumulator.description! + ")"
                 }
                 
             case .binaryOp(let binaryFunc):
-                if accumulator != nil {
-                    pendingBinaryOperation = PendingBinaryOperation(function: binaryFunc, firstOperand: accumulator!)
-                    accumulator = nil // prevents display from changing
+                if pendingBinaryOperation != nil {
+                    performPendingBinaryOperation()
                 }
+                if accumulator.value != nil {
+                    pendingBinaryOperation = PendingBinaryOperation(function: binaryFunc, firstOperand: accumulator.value!)
+                    accumulator.value = nil // prevents display from changing
+                }
+                accumulator.description! += " \(symbol)"
 
             case .equals:
                 performPendingBinaryOperation()
+                pendingBinaryOperation = nil    // not so sure about this
+                accumulator.description = ""    // not sure about this
             }
+        }
+        if let msg = accumulator.description {
+            print("performOperation: \(msg)")
         }
     }
     
