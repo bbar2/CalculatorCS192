@@ -15,9 +15,12 @@ class ViewController: UIViewController {
 
     var userIsTyping = false
 
-    // IS this Weak var to avoid an ownership loop with the model which puts results in the display.
+    /// Calculator display shows current operand or result of previous operation.
     @IBOutlet weak var display: UILabel! // ! - yes its an optional, but I will auto unwrap everyplace.
 
+    /// Simulated paper tape showing steps leading to result shown in display.
+    @IBOutlet weak var paperTape: UILabel!
+    
     // Computed property - just simply a different way of interacting with the var "display"
     var displayValue : Double {
         get{
@@ -29,7 +32,7 @@ class ViewController: UIViewController {
         }
     }
 
-    // process numeric inputs - no interaction with model as number is built up
+    /// process numeric inputs - no interaction with model as number is built up
     @IBAction func touchDigit(_ sender: UIButton) {
 
         let digit = sender.currentTitle!
@@ -37,8 +40,9 @@ class ViewController: UIViewController {
 
         switch digit
         {
-        case ".":   // add preceeding 0 if first digit is decimal place
+        case ".":
             if userIsTyping == false {
+                // add preceeding 0 if first digit is decimal place
                 display.text = "0."
                 userIsTyping = true
             } else if currentText.contains("."){
@@ -46,10 +50,10 @@ class ViewController: UIViewController {
                 return
             }
             else {
-                display.text = currentText + digit
+                display.text = currentText + "."
             }
             
-        case "⌫":   // Don't do anything if first char is a backspace
+        case "⌫":
             if userIsTyping == false{
                 return   // do nothing if first char is a backspace
             } else {
@@ -57,13 +61,14 @@ class ViewController: UIViewController {
                 if newText.characters.count > 0 {
                     display.text = newText
                 } else {
+                    // last char removed -- start over
                     display.text = "0"
                     userIsTyping = false
                 }
             }
             break;
             
-        default:    // normal case is process the numeric digit
+        default:    // Process the numeric digit
             if userIsTyping {
                 display.text = currentText + digit
             } else {
@@ -74,24 +79,31 @@ class ViewController: UIViewController {
     }
     
     
-    // When an operation button is pressed, send operands and operations to the model
+    /// When an operation button is pressed, send operands and operations to the model
     @IBAction func performOperation(_ sender: UIButton) {
         
         if userIsTyping{
             model.setOperand(displayValue)
             userIsTyping = false
         }
-        userIsTyping = false;
         
         if let calcOperator = sender.currentTitle {
             model.performOperation(calcOperator)
+        } else {
+            print ("performOperation - nil currentTitle")
         }
         
-        if let result = model.result{
-            displayValue = result
+        displayValue = model.result ?? 0    // for nil model results, default display to 0
+        
+        if let equation = model.equation {
+            if (model.resultIsPending) {
+                paperTape.text = equation + " ..."
+            } else {
+                paperTape.text = equation + " ="
+            }
+        } else {
+            paperTape.text = "nothin happinin man"
         }
     }
-    
-    
 }
 
