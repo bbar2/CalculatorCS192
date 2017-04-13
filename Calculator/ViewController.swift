@@ -19,19 +19,35 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel! // ! - yes its an optional, but I will auto unwrap everyplace.
 
     /// Simulated paper tape showing steps leading to result shown in display.
-    @IBOutlet weak var paperTape: UILabel!
+    @IBOutlet weak var currentEquation: UILabel!
     
+   
     // Computed property - just simply a different way of interacting with the var "display"
     var displayValue : Double {
         get{
             return Double(display.text!)!
         }
-        
+
         set{
-            display.text = String(newValue)
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 6
+            display.text = formatter.string(from: NSNumber(value:newValue)) ?? "Not a Number"
         }
     }
-
+    
+    @IBAction func clearCalc(_ sender: UIButton) {
+        model.clearModel()
+        displayValue = 0
+        currentEquation.text = "Ready for Input"
+        
+        let inSecondMode = secondMode ?? false
+        if inSecondMode {
+            secondOp(sender)
+            secondMode = false
+        }
+    }
+    
     /// process numeric inputs - no interaction with model as number is built up
     @IBAction func touchDigit(_ sender: UIButton) {
 
@@ -78,7 +94,6 @@ class ViewController: UIViewController {
         }
     }
     
-    
     /// When an operation button is pressed, send operands and operations to the model
     @IBAction func performOperation(_ sender: UIButton) {
         
@@ -89,20 +104,40 @@ class ViewController: UIViewController {
         
         if let calcOperator = sender.currentTitle {
             model.performOperation(calcOperator)
-        } else {
-            print ("performOperation - nil currentTitle")
         }
         
         displayValue = model.result ?? 0    // for nil model results, default display to 0
         
         if let equation = model.equation {
             if (model.resultIsPending) {
-                paperTape.text = equation + " ..."
+                currentEquation.text = equation + " ..."
             } else {
-                paperTape.text = equation + " ="
+                currentEquation.text = equation + " ="
             }
         } else {
-            paperTape.text = "nothin happinin man"
+            currentEquation.text = "Error model.equation = nil in performOperation"
+        }
+    }
+
+    private var secondMode : Bool?
+    @IBOutlet weak var sinButton: UIButton!
+    @IBOutlet weak var cosButton: UIButton!
+    @IBOutlet weak var tanButton: UIButton!
+
+    @IBAction func secondOp(_ sender: Any) {
+    
+        let inSecondMode = secondMode ?? false
+
+        if inSecondMode {
+            sinButton.setTitle("sin", for: .normal)
+            cosButton.setTitle("cos", for: .normal)
+            tanButton.setTitle("tan", for: .normal)
+            secondMode = false
+        } else {
+            sinButton.setTitle("sin⁻¹", for: .normal)
+            cosButton.setTitle("cos⁻¹", for: .normal)
+            tanButton.setTitle("tan⁻¹", for: .normal)
+            secondMode = true
         }
     }
 }
