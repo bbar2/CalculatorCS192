@@ -9,12 +9,17 @@
 import XCTest
 @testable import Calculator
 
+var viewController :ViewController!
+
 class CalculatorUITests: XCTestCase {
         
     override func setUp() {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
+        
+        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
+        viewController = storyboard.instantiateInitialViewController() as! ViewController
         
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
@@ -42,7 +47,9 @@ class CalculatorUITests: XCTestCase {
         app.buttons["5"].tap()
         app.buttons["="].tap()
         
-        let answer = app.staticTexts("78");
+        let answer = viewController?.display?.text
+        XCTAssert(answer == "390", "Bad Description: \(answer!)")
+        
         
     }
     
