@@ -227,6 +227,9 @@ struct CalculatorModel {
                     performPendingBinaryOperation()
                     pendingBinaryOperation = nil
                     accumulator.secondOperandShowing = false
+                } else {
+                    let operand = accumulator.value ?? 0
+                    accumulator.description = calculatorString(operand)
                 }
             }
         }

@@ -107,15 +107,12 @@ class ViewController: UIViewController {
         }
         
         displayValue = model.result ?? 0    // for nil model results, default display to 0
-        
-        if let equation = model.equation {
-            if (model.resultIsPending) {
-                currentEquation.text = equation + " ..."
-            } else {
-                currentEquation.text = equation + " ="
-            }
+
+        assert(model.equation != nil, "Error model.equation = nil in performOperation")
+        if (model.resultIsPending) {
+            currentEquation.text = model.equation! + " ..."
         } else {
-            currentEquation.text = "Error model.equation = nil in performOperation"
+            currentEquation.text = model.equation! + " ="
         }
     }
 
