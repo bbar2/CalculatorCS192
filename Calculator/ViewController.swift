@@ -11,7 +11,7 @@ import UIKit
 class ViewController: UIViewController {
     
     // Controller instantiates the model
-    private var model = CalculatorModel()
+    var model = CalculatorModel()
 
     var userIsTyping = false
 
