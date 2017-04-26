@@ -9,24 +9,21 @@
 import XCTest
 @testable import Calculator
 
-var viewController :ViewController!
-
 class CalculatorUITests: XCTestCase {
-        
+
+    private var app :XCUIApplication? = nil
+    
     override func setUp() {
         super.setUp()
         
         // Put setup code here. This method is called before the invocation of each test method in the class.
         
-        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
-        viewController = storyboard.instantiateInitialViewController() as! ViewController
-        
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
 
         // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
-        XCUIApplication().launch()
-        
+        app = XCUIApplication()
+        app?.launch()
 
         // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
     }
@@ -36,21 +33,24 @@ class CalculatorUITests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        
-        let app = XCUIApplication()
-        app.buttons["7"].tap()
-        app.buttons["8"].tap()
-        app.buttons["✕"].tap()
-        app.buttons["5"].tap()
-        app.buttons["="].tap()
-        
-        let answer = viewController?.display?.text
-        XCTAssert(answer == "390", "Bad Description: \(answer!)")
-        
-        
+    func testDecimalFirst() {
+        XCTAssert(app != nil, "No app in UITest")
+        app!.buttons["."].tap()
+
+        XCTAssert(app!.staticTexts["0."].exists == true, "Did not Find expected result")
     }
+    
+    func testMultiDecimalInput() {
+        XCTAssert(app != nil, "No app in UITest")
+        app!.buttons["7"].tap()
+        app!.buttons["."].tap()
+        app!.buttons["3"].tap()
+        app!.buttons["."].tap()
+        app!.buttons["6"].tap()
+
+        XCTAssert(app!.staticTexts["7.36"].exists == true, "Did not Find expected result")
+    }
+    
+
     
 }
