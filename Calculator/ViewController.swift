@@ -11,19 +11,24 @@ import UIKit
 class ViewController: UIViewController {
     
     // Controller instantiates the model
-    var model = CalculatorModel()
+    private var model = CalculatorModel()
 
-    var userIsTyping = false
+    private var userIsTyping = false
 
     /// Calculator display shows current operand or result of previous operation.
-    @IBOutlet weak var display: UILabel! // ! - yes its an optional, but I will auto unwrap everyplace.
+    @IBOutlet weak var display: UILabel! // ! optional will auto unwrap everyplace
 
     /// Simulated paper tape showing steps leading to result shown in display.
     @IBOutlet weak var currentEquation: UILabel!
     
-   
+    private var secondMode : Bool?
+    
+    @IBOutlet weak var sinButton: UIButton!
+    @IBOutlet weak var cosButton: UIButton!
+    @IBOutlet weak var tanButton: UIButton!
+    
     // Computed property - just simply a different way of interacting with the var "display"
-    var displayValue : Double {
+    private var displayValue : Double {
         get{
             return Double(display.text!)!
         }
@@ -115,11 +120,6 @@ class ViewController: UIViewController {
             currentEquation.text = model.equation! + " ="
         }
     }
-
-    private var secondMode : Bool?
-    @IBOutlet weak var sinButton: UIButton!
-    @IBOutlet weak var cosButton: UIButton!
-    @IBOutlet weak var tanButton: UIButton!
 
     @IBAction func secondOp(_ sender: Any) {
     
