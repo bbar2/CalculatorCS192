@@ -18,9 +18,13 @@ class ViewController: UIViewController {
     /// Calculator display shows current operand or result of previous operation.
     @IBOutlet weak var display: UILabel! // ! optional will auto unwrap everyplace
 
-    /// Simulated paper tape showing steps leading to result shown in display.
+    /// Steps leading to result shown in display.
     @IBOutlet weak var currentEquation: UILabel!
     
+    /// Show value in memory in this label
+    @IBOutlet weak var memoryDisplay: UILabel!
+    
+    /// View state for trig buttons - invert in second mode
     private var secondMode : Bool?
     
     @IBOutlet weak var sinButton: UIButton!
@@ -83,7 +87,7 @@ class ViewController: UIViewController {
                     display.text = newText
                 } else {
                     // last char removed -- start over
-                    display.text = "0"
+                    displayValue = 0
                     userIsTyping = false
                 }
             }
@@ -99,7 +103,7 @@ class ViewController: UIViewController {
         }
     }
     
-    /// When an operation button is pressed, send operands and operations to the model
+    /// When an operation button is pressed, send operands and operations to the model.  Update display and currentEquation from model results
     @IBAction func performOperation(_ sender: UIButton) {
         
         if userIsTyping{
@@ -121,6 +125,8 @@ class ViewController: UIViewController {
         }
     }
 
+    /// redefine key operations based on secondMode.
+    /// e.g. Switch between sin, cos, tan; and asin, acos, atan
     @IBAction func secondOp(_ sender: Any) {
     
         let inSecondMode = secondMode ?? false

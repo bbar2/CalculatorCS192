@@ -10,23 +10,28 @@ import Foundation
 
 struct CalculatorModel {
 
-    /// Public API
+    // Non-Private API - default is internal = public within module
     
-    public mutating func  clearModel() {
+    /// Reset the model to it's boot up state
+    mutating func  clearModel()
+    {
         accumulator.value = nil
         accumulator.description = nil
         pendingBinaryOperation = nil
-        accumulator.secondOperandShowing = nil
+        secondOperandShowing = nil
+        variable = nil
     }
     
-    /// Numeric of CalculatorModel
+    /// Result of most recent operation
+    /// IMPLEMENT WITH EVALUATE()
     var result: Double? {
         get {
             return accumulator.value
         }
     }
     
-    /// Return true if pendingFunction and Operator are stored in pendingBinaryOperation member.
+    /// Return true if in the middle of a binary operation.
+    /// IMPLEMENT WITH EVALUATE()
     var resultIsPending: Bool  {
         get {
             return pendingBinaryOperation != nil;
@@ -34,9 +39,10 @@ struct CalculatorModel {
     }
     
     /// Sequence of steps that lead to the numeric output of CalculatorModel
+    /// IMPLEMENT WITH EVALUATE() -- this is effectively "description"
     var equation: String? {
         get {
-            if resultIsPending && !accumulator.secondOperandShowing!{
+            if resultIsPending && secondOperandShowing! == false{
                 return accumulator.description! + " " +
                     pendingBinaryOperation!.pendingOperationString
             } else {
@@ -45,17 +51,37 @@ struct CalculatorModel {
         }
     }
     
-    /// When an operand is required, the viewController calls setOperand just
-    /// before calling performOperation.  performOperation will update
-    /// accumulator.description differently depending on the Operation enum.
-    mutating func setOperand(_ operand: Double){
-        
+    /// Put an operand in the accumulator. Called by:
+    ///  1. viewController just before calling performOperation.  
+    ///     performOperation will update accumulator.description 
+    ///     differently depending on the Operation enum.
+    ///  2. model.performOperation(symbol.constant) to load accumulator 
+    ///     with a constant
+    mutating func setOperand(_ operand: Double)
+    {
         accumulator.value = operand
         
         if !resultIsPending {
             accumulator.description = nil
-            accumulator.secondOperandShowing = false
+            secondOperandShowing = false
         }
+    }
+
+    /// Allow input of variables.
+    public mutating func setOperand(variable named: String)
+    {
+        if variable == nil {
+            variable = [String:Double]()
+        }
+        variable![named] = accumulator.value
+    }
+    
+    /// REQUIREMENT - THIS MUST REMAIN NON-MUTATING
+    /// If variable not found in dictounary, assume it's zero
+    func evaluate(using variables: Dictionary<String,Double>? = nil)
+        -> (result: Double?, isPending: Bool, description: String)
+    {
+       return (0.0, true, "moma")
     }
     
     /// Perform a calculator operation. Up to two operands may be available in
@@ -74,11 +100,11 @@ struct CalculatorModel {
                         accumulator.description = currentDescription +
                             " " + pendingBinaryOperation!.pendingOperationString +
                             " " + symbol
-                        accumulator.secondOperandShowing = true
+                        secondOperandShowing = true
                     }
                 } else {
                     accumulator.description = symbol
-                    accumulator.secondOperandShowing = false
+                    secondOperandShowing = false
                 }
                 
             // no operand - perform the noOperandFunc from the operations:Dictionary using no operand
@@ -92,12 +118,12 @@ struct CalculatorModel {
                         accumulator.description! +=
                             " " + pendingBinaryOperation!.pendingOperationString +
                             " " + symbol
-                        accumulator.secondOperandShowing = true
+                        secondOperandShowing = true
                     }
                 } else {
                     // if no pending binary op, noOperandFunc loads accumulator
                     accumulator.description = symbol
-                    accumulator.secondOperandShowing = false
+                    secondOperandShowing = false
                 }
                 
             // one operand - perform the unaryFunc from the operations:Dictionary using the accumulator as the one operand
@@ -112,12 +138,12 @@ struct CalculatorModel {
                     accumulator.description = operandDescription +
                         " " + pendingBinaryOperation!.pendingOperationString +
                         " " + symbol + "(" + calculatorString(singleOperand) + ")"
-                    accumulator.secondOperandShowing = true
+                    secondOperandShowing = true
                 } else {
                     // if no pending binary op, unaryOp is operating on
                     // equation that lead to current accumulator
                     accumulator.description = symbol + "(" + operandDescription + ")"
-                    accumulator.secondOperandShowing = false
+                    secondOperandShowing = false
                 }
                 
                 // Save first operand and binaryFunc from the operations:Dictionary.
@@ -135,7 +161,7 @@ struct CalculatorModel {
                 // If necessary, initialize the accumulator description
                 if accumulator.description == nil {
                     accumulator.description = calculatorString(firstOperand)
-                    accumulator.secondOperandShowing = false
+                    secondOperandShowing = false
                 }
                 
                 // Save the accumulator.value and binaryFunc in pendingBinaryOperation var
@@ -145,14 +171,14 @@ struct CalculatorModel {
                     firstOperand: firstOperand)
                 
                 // constants or Operation.unaryOp will show the second operand prior to Operation.equals
-                accumulator.secondOperandShowing = false
+                secondOperandShowing = false
                 
             // Execute a pending binary operation
             case .equals:
                 if resultIsPending {
                     performPendingBinaryOperation()
                     pendingBinaryOperation = nil
-                    accumulator.secondOperandShowing = false
+                    secondOperandShowing = false
                 } else {
                     let operand = accumulator.value ?? 0
                     accumulator.description = calculatorString(operand)
@@ -163,6 +189,9 @@ struct CalculatorModel {
     
     /// Private stuff below ///
     
+    /// Optional Dictionary will hold variable operand - added via setOperand
+    private var variable :[String: Double]?
+
     /// Heart of calculator is this enum and it's associated types
     private enum Operation {
         case constant(Double)                   // associated value is double
@@ -172,11 +201,14 @@ struct CalculatorModel {
         case equals                             // execute a pending binaryOp
     }
 
-    /// secondOperatnShowing is True if accumulator.description has pending operation, and is showing a second operand.
     /// Using an Operation.constant for the second operand, or Operation.unaryOp on the second operand
     /// will result in accumulator.description showing the second operand prior to receiving an Operation.equals operation.
-    private var accumulator: (value: Double?, description: String?, secondOperandShowing :Bool?)
+    private var accumulator:(value: Double?, description: String?)
 
+    /// secondOperandShowing is True if accumulator.description has pending operation, and is showing a second operand.
+    private var secondOperandShowing :Bool?
+    
+    private var test = false
 
     /// Structure of local storage for first operand and pendingFunction, used
     /// while second operand is built by viewController.
@@ -196,7 +228,7 @@ struct CalculatorModel {
     /// using pendingBinaryOperation.firstOperand and accumulator.value as second operand
     private mutating func performPendingBinaryOperation() {
         if pendingBinaryOperation != nil && accumulator.value != nil {
-            if accumulator.description != nil && accumulator.secondOperandShowing != nil && !accumulator.secondOperandShowing! {
+            if accumulator.description != nil && secondOperandShowing != nil && secondOperandShowing! == false {
                 accumulator.description! += " " + pendingBinaryOperation!.pendingOperationString + " " + calculatorString(accumulator.value!)
             }
             accumulator.value = pendingBinaryOperation!.perform(with:accumulator.value!)
