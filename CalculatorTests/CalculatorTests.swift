@@ -28,7 +28,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(7)
         model.performOperation("+")
         
-        XCTAssert(model.equation == "7 +", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 +", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == true, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 7, "Bad Result: \(model.result!)")
     }
@@ -39,7 +39,7 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("+")
         model.setOperand(9)
         
-        XCTAssert(model.equation == "7 +", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 +", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == true, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 9, "Bad Result: \(model.result!)")
     }
@@ -51,7 +51,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(9)
         model.performOperation("=")
         
-        XCTAssert(model.equation == "7 + 9", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 + 9", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 16, "Bad Result: \(model.result!)")
     }
@@ -64,7 +64,7 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.performOperation("√")
         
-        XCTAssert(model.equation == "√(7 + 9)", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "√(7 + 9)", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 4, "Bad Result: \(model.result!)")
     }
@@ -80,7 +80,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(2)
         model.performOperation("=")
         
-        XCTAssert(model.equation == "√(7 + 9) + 2", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "√(7 + 9) + 2", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 6, "Bad Result: \(model.result!)")
     }
@@ -92,7 +92,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(9)
         model.performOperation("√")
         
-        XCTAssert(model.equation == "7 + √(9)", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 + √(9)", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == true, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 3, "Bad Result: \(model.result!)")
     }
@@ -105,7 +105,7 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("√")
         model.performOperation("=")
         
-        XCTAssert(model.equation == "7 + √(9)", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 + √(9)", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 10, "Bad Result: \(model.result!)")
     }
@@ -123,7 +123,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(3)
         model.performOperation("=")
         
-        XCTAssert(model.equation == "7 + 9 + 6 + 3", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "7 + 9 + 6 + 3", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 25, "Bad Result: \(model.result!)")
     }
@@ -140,7 +140,7 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(3)
         model.performOperation("=")
         
-        XCTAssert(model.equation == "6 + 3", "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == "6 + 3", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 9, "Bad Result: \(model.result!)")
     }
@@ -153,8 +153,8 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.setOperand(73)
         
-        // although model.equation is nil, the equation display is still showing "5 + 6 ="
-        XCTAssert(model.equation == nil, "Bad Description: \(model.equation ?? "nil")")
+        // although model.description is nil, the equation display is still showing "5 + 6 ="
+        XCTAssert(model.description == nil, "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 73, "Bad Result: \(model.result!)")
     }
@@ -166,8 +166,8 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("π")
         model.performOperation("=")
         
-        // although model.equation is nil, the equation display is still showing "5 + 6 ="
-        XCTAssert(model.equation == "4 ✕ π", "Bad Description: \(model.equation ?? "nil")")
+        // although model.description is nil, the equation display is still showing "5 + 6 ="
+        XCTAssert(model.description == "4 ✕ π", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result! > 12.56637 && model.result! < 12.56638, "Bad Result: \(model.result!)")
     }
@@ -176,7 +176,7 @@ class CalculatorModelTests: XCTestCase {
     {
         model.clearModel()
         
-        XCTAssert(model.equation == nil, "Bad Description: \(model.equation ?? "nil")")
+        XCTAssert(model.description == nil, "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == nil, "Bad Result: \(model.result!)")
     }

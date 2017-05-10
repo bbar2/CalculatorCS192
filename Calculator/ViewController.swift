@@ -117,11 +117,11 @@ class ViewController: UIViewController {
         
         displayValue = model.result ?? 0    // for nil model results, default display to 0
 
-        assert(model.equation != nil, "Error model.equation = nil in performOperation")
+        assert(model.description != nil, "Error model.equation = nil in performOperation")
         if (model.resultIsPending) {
-            currentEquation.text = model.equation! + " ..."
+            currentEquation.text = model.description! + " ..."
         } else {
-            currentEquation.text = model.equation! + " ="
+            currentEquation.text = model.description! + " ="
         }
     }
 
