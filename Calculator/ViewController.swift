@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var currentEquation: UILabel!
     
     /// Show value in memory in this label
-    @IBOutlet weak var memoryDisplay: UILabel!
+    @IBOutlet weak var variableDisplay: UILabel!
     
     /// View state for trig buttons - invert in second mode
     private var secondMode : Bool?
@@ -49,7 +49,8 @@ class ViewController: UIViewController {
         model.clearModel()
         displayValue = 0
         currentEquation.text = "Ready for Input"
-        
+        variableDisplay.text = "0"
+
         let inSecondMode = secondMode ?? false
         if inSecondMode {
             secondOp(sender)
@@ -124,7 +125,30 @@ class ViewController: UIViewController {
             currentEquation.text = model.description! + " ="
         }
     }
+    
+    /// Inform the model that the operand is a variable
+    @IBAction func setVariableOperand(_ sender: UIButton)
+    {
+        model.setOperand(variable: "M")
+        userIsTyping = false;
 
+        displayValue = model.result ?? 0
+
+        assert(model.description != nil, "Error model.equation = nil in setVariableOperand")
+        currentEquation.text = model.description! + " ..."
+    }
+    
+    /// Set value of variable, and evaluate current equation using the variable.  Show result in display.  No change to equation.
+    @IBAction func updateVariable(_ sender: UIButton)
+    {
+        let variableValue = displayValue
+        userIsTyping = false
+
+        variableDisplay.text = String(variableValue)
+
+        displayValue = model.evaluate(using: ["M":variableValue]).result ?? 0
+    }
+    
     /// redefine key operations based on secondMode.
     /// e.g. Switch between sin, cos, tan; and asin, acos, atan
     @IBAction func secondOp(_ sender: Any) {

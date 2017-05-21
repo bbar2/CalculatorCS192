@@ -16,6 +16,7 @@
 		357F07851E86B1200076245B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 357F07831E86B1200076245B /* Main.storyboard */; };
 		357F07871E86B1200076245B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 357F07861E86B1200076245B /* Assets.xcassets */; };
 		357F078A1E86B1200076245B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 357F07881E86B1200076245B /* LaunchScreen.storyboard */; };
+		357FDE451ED0E77200BE8C5F /* A1CalculatorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357FDE441ED0E77200BE8C5F /* A1CalculatorModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		357F07861E86B1200076245B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		357F07891E86B1200076245B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		357F078B1E86B1200076245B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		357FDE441ED0E77200BE8C5F /* A1CalculatorModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = A1CalculatorModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,8 +122,9 @@
 			isa = PBXGroup;
 			children = (
 				357F07811E86B1200076245B /* ViewController.swift */,
-				357F07831E86B1200076245B /* Main.storyboard */,
 				353EDF791E8DC11D00B65DF0 /* CalculatorModel.swift */,
+				357FDE441ED0E77200BE8C5F /* A1CalculatorModel.swift */,
+				357F07831E86B1200076245B /* Main.storyboard */,
 				357F07911E86B3420076245B /* SupportingFiles */,
 			);
 			path = Calculator;
@@ -296,6 +299,7 @@
 				353EDF7A1E8DC11D00B65DF0 /* CalculatorModel.swift in Sources */,
 				357F07821E86B1200076245B /* ViewController.swift in Sources */,
 				357F07801E86B1200076245B /* AppDelegate.swift in Sources */,
+				357FDE451ED0E77200BE8C5F /* A1CalculatorModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -534,6 +538,7 @@
 				357CE0641EAD1608004F12E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		357F07771E86B11F0076245B /* Build configuration list for PBXProject "Calculator" */ = {
 			isa = XCConfigurationList;

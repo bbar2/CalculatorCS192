@@ -154,7 +154,8 @@ class CalculatorModelTests: XCTestCase {
         model.setOperand(73)
         
         // although model.description is nil, the equation display is still showing "5 + 6 ="
-        XCTAssert(model.description == nil, "Bad Description: \(model.description ?? "nil")")
+        // For assignment 2, the description is not optional, so test updated to test for ""
+        XCTAssert(model.description == nil || model.description == "", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == 73, "Bad Result: \(model.result!)")
     }
@@ -176,9 +177,61 @@ class CalculatorModelTests: XCTestCase {
     {
         model.clearModel()
         
-        XCTAssert(model.description == nil, "Bad Description: \(model.description ?? "nil")")
+        // For assignment 2, the description is not optional, so test updated to test for ""
+        XCTAssert(model.description == nil || model.description == "", "Bad Description: \(model.description ?? "nil")")
         XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
         XCTAssert(model.result == nil, "Bad Result: \(model.result!)")
+    }
+    
+    func testAssign2Requirement7e1()
+    {
+        model.clearModel()
+        model.setOperand(9)
+        model.performOperation("+")
+        model.setOperand(variable: "M")
+        model.performOperation("=")
+        model.performOperation("√")
+
+        XCTAssert(model.description == "√(9 + M)", "Bad Description: \(model.description ?? "nil")")
+        XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
+        XCTAssert(model.result == 3, "Bad Result: \(model.result!)")
+    }
+
+    func testAssign2Requirement7e2()
+    {
+        model.clearModel()
+        model.setOperand(9)
+        model.performOperation("+")
+        model.setOperand(variable: "M")
+        model.performOperation("=")
+        model.performOperation("√")
+
+        XCTAssert(model.evaluate(using:["M":7]).result
+            == 4, "Bad Result: \(model.result!)")
+        
+        XCTAssert(model.description == "√(9 + M)", "Bad Description: \(model.description ?? "nil")")
+        XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
+    }
+    
+    func testAssign2Requirement7e3()
+    {
+        model.clearModel()
+        model.setOperand(9)
+        model.performOperation("+")
+        model.setOperand(variable: "M")
+        model.performOperation("=")
+        model.performOperation("√")
+        
+        XCTAssert(model.evaluate(using:["M":7]).result
+            == 4, "Bad Result: \(model.result!)")
+        
+        model.performOperation("+")
+        model.setOperand(14)
+        model.performOperation("=")
+
+        XCTAssert(model.result == 18, "Bad Result: \(model.result!)")
+        XCTAssert(model.description == "√(9 + M) + 14", "Bad Description: \(model.description ?? "nil")")
+        XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
     }
     
 //    func testPerformanceExample() {
