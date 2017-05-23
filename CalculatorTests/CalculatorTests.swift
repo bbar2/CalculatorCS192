@@ -206,7 +206,8 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.performOperation("√")
 
-        XCTAssert(model.evaluate(using:["M":7]).result
+        model.setVariableValue("M", 7)
+        XCTAssert(model.evaluate(using:model.variableList).result
             == 4, "Bad Result: \(model.result!)")
         
         XCTAssert(model.description == "√(9 + M)", "Bad Description: \(model.description ?? "nil")")
@@ -222,7 +223,8 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.performOperation("√")
         
-        XCTAssert(model.evaluate(using:["M":7]).result
+        model.setVariableValue("M", 7)
+        XCTAssert(model.evaluate(using:model.variableList).result
             == 4, "Bad Result: \(model.result!)")
         
         model.performOperation("+")

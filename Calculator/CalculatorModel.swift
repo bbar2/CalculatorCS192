@@ -25,32 +25,35 @@ struct CalculatorModel {
     // Non-Private API - default is internal = public within module
     
     /// Model variable dictionary
-    var variables:Dictionary<String, Double>? = nil
+    // this violates assigmnet 2, rqmt 1: No additional public API for model
+    var variableList:Dictionary<String, Double>? = nil
     
     /// Reset the model to it's boot up state
     mutating func  clearModel()
     {
         actionList.removeAll()
+        variableList?.removeAll()
+        variableList = nil;
     }
     
     /// Result of most recent operation
     var result: Double? {
         get {
-            return evaluate().result
+            return evaluate(using: variableList).result
         }
     }
     
     /// Return true if in the middle of a binary operation.
     var resultIsPending: Bool  {
         get {
-            return evaluate().isPending
+            return evaluate(using: variableList).isPending
         }
     }
     
     /// Sequence of steps that lead to the numeric output of CalculatorModel
     var description: String? {
         get {
-            return evaluate().description
+            return evaluate(using: variableList).description
         }
     }
     
@@ -65,11 +68,26 @@ struct CalculatorModel {
         actionList.append(ActionType.variable(named))
     }
     
+    // this violates assigmnet 2, rqmt 1: No additional public API for model
+    mutating func setVariableValue(_ varName:String, _ varValue:Double)
+    {
+        if variableList == nil {
+            variableList = [String: Double]()
+        }
+        variableList![varName] = varValue
+    }
+    
     mutating func performOperation(_ symbol: String)
     {
         actionList.append(ActionType.operation(symbol))
     }
 
+    mutating func undo()
+    {
+        if !actionList.isEmpty{
+        actionList.removeLast()
+        }
+    }
     
     func evaluate(using variables: Dictionary<String,Double>? = nil)
         -> (result: Double?, isPending: Bool, description: String)

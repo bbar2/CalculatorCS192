@@ -81,7 +81,24 @@ class ViewController: UIViewController {
             
         case "⌫":
             if userIsTyping == false{
-                return   // do nothing if first char is a backspace
+                // If not typing, undo the last operation
+                model.undo()
+
+                
+                let undoResult = model.evaluate(using: model.variableList)
+                displayValue = undoResult.result ?? 0
+
+                if (undoResult.description == ""){
+                    currentEquation.text = "Ready for Input"
+                } else
+                if (undoResult.isPending) {
+                    currentEquation.text = undoResult.description + " ..."
+                } else {
+                    currentEquation.text = undoResult.description + " ="
+                }
+                
+                
+                return
             } else {
                 let newText = currentText.substring(to: currentText.index(before: currentText.endIndex))
                 if newText.characters.count > 0 {
@@ -126,7 +143,7 @@ class ViewController: UIViewController {
         }
     }
     
-    /// Inform the model that the operand is a variable
+    /// (M Key) Inform the model that the operand is a variable
     @IBAction func setVariableOperand(_ sender: UIButton)
     {
         model.setOperand(variable: "M")
@@ -138,15 +155,18 @@ class ViewController: UIViewController {
         currentEquation.text = model.description! + " ..."
     }
     
-    /// Set value of variable, and evaluate current equation using the variable.  Show result in display.  No change to equation.
+    /// (Arrow M Key) Set value of variable, and evaluate current equation using the variable.  Show result in display.  No change to equation.
     @IBAction func updateVariable(_ sender: UIButton)
     {
-        let variableValue = displayValue
         userIsTyping = false
+        
+        variableDisplay.text = String(displayValue)
+        
+        // this violates assigmnet 2, rqmt 1: No additional public API for model
+        // this violates assigmnet 2, rqmt 7d: M keys are Controller, not model, mechanics
+        model.setVariableValue("M", displayValue)
 
-        variableDisplay.text = String(variableValue)
-
-        displayValue = model.evaluate(using: ["M":variableValue]).result ?? 0
+        displayValue = model.evaluate(using: model.variableList).result ?? 0
     }
     
     /// redefine key operations based on secondMode.
