@@ -5,6 +5,9 @@
 //  Created by Barry Bryant on 4/23/17.
 //  Copyright © 2017 b3sk. All rights reserved.
 //
+//  Tests for assignment 1 and assignement 2 model.
+//  Assignment 1 tests use model.result, model.isPending, and model.desctription.
+//  Assigmment 2 tests use evaluate for those terms.
 
 import XCTest
 @testable import Calculator
@@ -206,12 +209,10 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.performOperation("√")
 
-        model.setVariableValue("M", 7)
-        XCTAssert(model.evaluate(using:model.variableList).result
-            == 4, "Bad Result: \(model.result!)")
-        
-        XCTAssert(model.description == "√(9 + M)", "Bad Description: \(model.description ?? "nil")")
-        XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
+        let testResult = model.evaluate(using:["M": 7.0])
+        XCTAssert(testResult.result == 4, "Bad Result: \(testResult.result!)")
+        XCTAssert(testResult.description == "√(9 + M)", "Bad Description: \(testResult.description)")
+        XCTAssert(testResult.isPending == false, "Bad resultIsPending: \(testResult.isPending)")
     }
     
     func testAssign2Requirement7e3()
@@ -223,17 +224,16 @@ class CalculatorModelTests: XCTestCase {
         model.performOperation("=")
         model.performOperation("√")
         
-        model.setVariableValue("M", 7)
-        XCTAssert(model.evaluate(using:model.variableList).result
-            == 4, "Bad Result: \(model.result!)")
+        let viewVariable = ["M": 7.0]
+        XCTAssert(model.evaluate(using:viewVariable).result == 4, "Bad Result: \(model.result!)")
         
         model.performOperation("+")
         model.setOperand(14)
         model.performOperation("=")
-
-        XCTAssert(model.result == 18, "Bad Result: \(model.result!)")
-        XCTAssert(model.description == "√(9 + M) + 14", "Bad Description: \(model.description ?? "nil")")
-        XCTAssert(model.resultIsPending == false, "Bad resultIsPending: \(model.resultIsPending)")
+        let testResult = model.evaluate(using:viewVariable)
+        XCTAssert(testResult.result == 18, "Bad Result: \(model.result!)")
+        XCTAssert(testResult.description == "√(9 + M) + 14", "Bad Description: \(testResult.description)")
+        XCTAssert(testResult.isPending == false, "Bad resultIsPending: \(testResult.isPending)")
     }
     
 //    func testPerformanceExample() {

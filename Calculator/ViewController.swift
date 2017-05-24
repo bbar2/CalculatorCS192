@@ -5,6 +5,9 @@
 //  Created by Barry Bryant on 3/25/17.
 //  Copyright © 2017 b3sk. All rights reserved.
 //
+//  Assignment 2 View controller modified to hold a local variable list, and 
+//  to use evaluate for access to model result, isPending, and description.
+//
 
 import UIKit
 
@@ -27,6 +30,12 @@ class ViewController: UIViewController {
     /// View state for trig buttons - invert in second mode
     private var secondMode : Bool?
     
+    /// Model variable dictionary
+    var variableList:Dictionary<String, Double>? = nil
+    
+    /// Initial display message constant
+    let initialEquationText = "Ready for Input"
+
     @IBOutlet weak var sinButton: UIButton!
     @IBOutlet weak var cosButton: UIButton!
     @IBOutlet weak var tanButton: UIButton!
@@ -34,7 +43,7 @@ class ViewController: UIViewController {
     // Computed property - just simply a different way of interacting with the var "display"
     private var displayValue : Double {
         get{
-            return Double(display.text!)!
+            return Double(display.text!) ?? Double.nan   // return nan if can't convert
         }
 
         set{
@@ -48,7 +57,7 @@ class ViewController: UIViewController {
     @IBAction func clearCalc(_ sender: UIButton) {
         model.clearModel()
         displayValue = 0
-        currentEquation.text = "Ready for Input"
+        currentEquation.text = initialEquationText
         variableDisplay.text = "0"
 
         let inSecondMode = secondMode ?? false
@@ -56,6 +65,9 @@ class ViewController: UIViewController {
             secondOp(sender)
             secondMode = false
         }
+
+        variableList?.removeAll()
+        variableList = nil;             // Req #9: Discard variable Dictionary
     }
     
     /// process numeric inputs - no interaction with model as number is built up
@@ -83,13 +95,12 @@ class ViewController: UIViewController {
             if userIsTyping == false{
                 // If not typing, undo the last operation
                 model.undo()
-
                 
-                let undoResult = model.evaluate(using: model.variableList)
+                let undoResult = model.evaluate(using: variableList)
                 displayValue = undoResult.result ?? 0
 
                 if (undoResult.description == ""){
-                    currentEquation.text = "Ready for Input"
+                    currentEquation.text = initialEquationText
                 } else
                 if (undoResult.isPending) {
                     currentEquation.text = undoResult.description + " ..."
@@ -97,8 +108,6 @@ class ViewController: UIViewController {
                     currentEquation.text = undoResult.description + " ="
                 }
                 
-                
-                return
             } else {
                 let newText = currentText.substring(to: currentText.index(before: currentText.endIndex))
                 if newText.characters.count > 0 {
@@ -133,13 +142,13 @@ class ViewController: UIViewController {
             model.performOperation(calcOperator)
         }
         
-        displayValue = model.result ?? 0    // for nil model results, default display to 0
+        let operationResult = model.evaluate(using: variableList)
+        displayValue = operationResult.result ?? 0
 
-        assert(model.description != nil, "Error model.equation = nil in performOperation")
-        if (model.resultIsPending) {
-            currentEquation.text = model.description! + " ..."
+        if (operationResult.isPending) {
+            currentEquation.text = operationResult.description + " ..."
         } else {
-            currentEquation.text = model.description! + " ="
+            currentEquation.text = operationResult.description + " ="
         }
     }
     
@@ -149,24 +158,26 @@ class ViewController: UIViewController {
         model.setOperand(variable: "M")
         userIsTyping = false;
 
-        displayValue = model.result ?? 0
-
-        assert(model.description != nil, "Error model.equation = nil in setVariableOperand")
-        currentEquation.text = model.description! + " ..."
+        let evaluateResult = model.evaluate(using: variableList)
+        displayValue = evaluateResult.result ?? 0
+        currentEquation.text = evaluateResult.description + " ..."
     }
     
-    /// (Arrow M Key) Set value of variable, and evaluate current equation using the variable.  Show result in display.  No change to equation.
+    /// (→M Key) Set value of variable, and evaluate current equation using the variable.  Show result in display.  No change to equation.
     @IBAction func updateVariable(_ sender: UIButton)
     {
         userIsTyping = false
         
         variableDisplay.text = String(displayValue)
         
-        // this violates assigmnet 2, rqmt 1: No additional public API for model
-        // this violates assigmnet 2, rqmt 7d: M keys are Controller, not model, mechanics
-        model.setVariableValue("M", displayValue)
+        // Update local variable list
+        if variableList == nil {
+            variableList = [String: Double]()
+        }
+        variableList!["M"] = displayValue
+        
 
-        displayValue = model.evaluate(using: model.variableList).result ?? 0
+        displayValue = model.evaluate(using: variableList).result ?? 0
     }
     
     /// redefine key operations based on secondMode.

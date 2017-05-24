@@ -5,6 +5,11 @@
 //  Created by Barry Bryant on 3/30/17.
 //  Copyright © 2017 b3sk. All rights reserved.
 //
+//  This is the model for assignment 2. Implements the actionList, undo, variables kept in model, and evaluate.
+//  Uses a private instance of the assignment 1 model with one modification.
+//  - Added one method mutating func setOperand(variable named:String, value:Double) to the private
+//    assignment 1 model, which is not exposed publicly from this model.
+//
 
 import Foundation
 
@@ -24,36 +29,30 @@ struct CalculatorModel {
 
     // Non-Private API - default is internal = public within module
     
-    /// Model variable dictionary
-    // this violates assigmnet 2, rqmt 1: No additional public API for model
-    var variableList:Dictionary<String, Double>? = nil
-    
     /// Reset the model to it's boot up state
     mutating func  clearModel()
     {
         actionList.removeAll()
-        variableList?.removeAll()
-        variableList = nil;
     }
     
-    /// Result of most recent operation
+    /// Result of most recent operation - evaluating all variables as 0
     var result: Double? {
         get {
-            return evaluate(using: variableList).result
+            return evaluate().result
         }
     }
     
-    /// Return true if in the middle of a binary operation.
+    /// Return true if in the middle of a binary operation
     var resultIsPending: Bool  {
         get {
-            return evaluate(using: variableList).isPending
+            return evaluate().isPending
         }
     }
     
     /// Sequence of steps that lead to the numeric output of CalculatorModel
     var description: String? {
         get {
-            return evaluate(using: variableList).description
+            return evaluate().description
         }
     }
     
@@ -66,15 +65,6 @@ struct CalculatorModel {
     mutating func setOperand(variable named: String)
     {
         actionList.append(ActionType.variable(named))
-    }
-    
-    // this violates assigmnet 2, rqmt 1: No additional public API for model
-    mutating func setVariableValue(_ varName:String, _ varValue:Double)
-    {
-        if variableList == nil {
-            variableList = [String: Double]()
-        }
-        variableList![varName] = varValue
     }
     
     mutating func performOperation(_ symbol: String)
@@ -104,7 +94,7 @@ struct CalculatorModel {
                 a1Model.setOperand(operand)
                 
             case .variable(let variableName):
-                // If variable not found in dictionary, assume it's zero
+                // If variable not found in dictionary, evaluate with 0
                 a1Model.setOperand(variable:variableName, value:variables?[variableName] ?? 0)
                 
             case .operation( let operationSymbol):
